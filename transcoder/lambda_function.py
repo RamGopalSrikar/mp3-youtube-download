@@ -1,7 +1,14 @@
 
 import boto3
+from enum import Enum
+class status(Enum):
+    EMPTY = 0
+    PROCESSING = 1
+    COMPLETED = 2
+    FAILED = 3
 
 def lambda_handler(event, context):
+    
     s3 = boto3.client('s3')
     response=s3.get_object(Bucket='srikar-static',Key='video.mp4')
 
