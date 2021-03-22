@@ -17,7 +17,17 @@ def lambda_handler(event, context):
     url_id=event['Records'][0]['body']
     print(url_id)
     url='https://www.youtube.com/watch?v='+url_id
+    
+    # removing special characters
+    alpha_url_id = ""
 
+    for character in url_id:
+        if character.isalnum():
+            alpha_url_id += character
+
+    print(alpha_url_id)
+    url_id=alpha_url_id
+    
     # checking if the file is present
     db = boto3.resource('dynamodb')
     db_tb=db.Table("MP3-youtube-downloader")
@@ -31,7 +41,6 @@ def lambda_handler(event, context):
         print('skip processing of the file')
 
     else:
-    
         print('entered processing of the file')
         s3filename=url_id+".mp4"
         ydl_opts = { 'outtmpl': '-', 'cachedir': False, 'logtostderr': True, 'format': 'bestaudio/best',

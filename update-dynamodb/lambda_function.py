@@ -19,4 +19,9 @@ def lambda_handler(event, context):
                 'Status' : 2,
              } )
     resp = s3.delete_object(Bucket='youtubemp3mediafiles', Key=deletekey)
+    
+    s3obj = boto3.resource('s3')
+    s3_object = s3obj.Object('youtubemp3mediafiles', keyvalue)
+    s3_object.metadata.update({'Content-Disposition':'attachment'})
+    s3_object.copy_from(CopySource={'Bucket':'youtubemp3mediafiles', 'Key': keyvalue}, Metadata=s3_object.metadata, MetadataDirective='REPLACE')
     print('done')

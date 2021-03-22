@@ -19,19 +19,28 @@ def lambda_handler(event, context):
     Status=0
     name = 'None'
     S3_presignedUrl='Not Available'
+    #removing special characters
+    alpha_url_id = ""
+
+    for character in URL_id:
+        if character.isalnum():
+            alpha_url_id += character
+
+    print(alpha_url_id)
+
     #checking if file already exist in dynamodb
     db = boto3.resource('dynamodb')
     db_tb=db.Table("MP3-youtube-downloader")
     val = db_tb.get_item(
     Key={
-        'VideoID' : URL_id
+        'VideoID' : alpha_url_id
     }
     )
     print(val)
     if 'Item' in val:
         print(val['Item'])
         Status=val['Item']['Status']
-        filename=URL_id+'.mp3'
+        filename=alpha_url_id+'.mp3'
         if (val['Item']['Status']==2):
             print('generating pre-signed URL')
             s3 = boto3.client('s3')
