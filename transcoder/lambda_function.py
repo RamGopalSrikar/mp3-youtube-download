@@ -1,6 +1,7 @@
 
 import boto3
 from enum import Enum
+
 class status(Enum):
     EMPTY = 0
     PROCESSING = 1
@@ -9,22 +10,23 @@ class status(Enum):
 
 def lambda_handler(event, context):
     
-    s3 = boto3.client('s3')
-    response=s3.get_object(Bucket='srikar-static',Key='video.mp4')
-
+    print(event)
+    keyvalue=event['Records'][0]['s3']['object']['key']
+    filename=keyvalue.split('.')[0]
+    outputkey=filename+'.mp3'
     outputs=[{
-            'Key': 'audio.mp3',
+            'Key': outputkey,
             'PresetId' : '1351620000001-300010',
         },]
 
     transcoder=boto3.client('elastictranscoder')
     response=transcoder.create_job(
-        PipelineId='1615590917710-tyvzlm',
+        PipelineId='1616349788040-7gsiuk',
         Input ={
-            'Key' : 'video.mp4',
+            'Key' : keyvalue,
             'Container' : 'mp4',
         },
         Outputs=outputs,
     )
-
+    print(response)
     print('done')

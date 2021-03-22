@@ -12,11 +12,10 @@ class status(Enum):
 
 def lambda_handler(event, context):
     # TODO implement
-
-    print(event)
-    URL_id=event['params']['path']['URL']
+    #URL_id=event['params']['path']['URL']
+    URL_id='sCbbMZ-q4-I'
     #initiating return parameters
-    Status=status.EMPTY.value
+    Status=0
     name = 'None'
     S3_presignedUrl='Not Available'
     #checking if file already exist in dynamodb
@@ -24,24 +23,25 @@ def lambda_handler(event, context):
     db_tb=db.Table("MP3-youtube-downloader")
     val = db_tb.get_item(
     Key={
-        'videoID' : URL_id
+        'VideoID' : URL_id
     }
     )
+    print(val)
     if 'Item' in val:
         print(val['Item'])
-        filename=val['Item']['filename']
         Status=val['Item']['Status']
-        name=filename.split('.')[0]
+        filename=URL_id+'.mp3'
         if (val['Item']['Status']==2):
+            print('generating pre-signed URL')
             s3 = boto3.client('s3')
-            S3_presignedUrl= s3.generate_presigned_url("get_object", Params={'Bucket':'test-srikar-data','Key':filename},ExpiresIn=100)
+            S3_presignedUrl= s3.generate_presigned_url("get_object", Params={'Bucket':'youtubemp3mediafiles','Key':filename},ExpiresIn=100)
         else:
             print('file is still processing')
     else:
+        print('file being sent for SQS to process')
         sqs = boto3.resource('sqs')
-        queue = sqs.get_queue_by_name(QueueName="YouTube-mp3player")
+        queue = sqs.get_queue_by_name(QueueName="youtubemp3requests")
         response=queue.send_message(MessageBody=URL_id)
-        print(response)
 
 
     return {

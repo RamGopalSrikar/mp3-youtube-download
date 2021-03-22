@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 import youtube_dl, sys
 from smart_open import open
 from contextlib import redirect_stdout
-
+import boto3
 from enum import Enum
 
 class status(Enum):
@@ -13,29 +13,26 @@ class status(Enum):
        
 def lambda_handler(event, context):
     print(event)
+
     url_id=event['Records'][0]['body']
-    url='https://www.youtube.com/watch?'+url_id
+    print(url_id)
+    url='https://www.youtube.com/watch?v='+url_id
 
     # checking if the file is present
     db = boto3.resource('dynamodb')
     db_tb=db.Table("MP3-youtube-downloader")
     val = db_tb.get_item(
     Key={
-        'videoID' : url_id
+        'VideoID' : url_id
     }
     )
-
+    print(val)
     if 'Item' in val:
         print('skip processing of the file')
 
     else:
-        db_tb.put_item(
-        Item={
-            'videoID' : url_id,
-            'Status' : status.PROCESSING,
-            'filename' : 'Not Available'
-        })
-
+    
+        print('entered processing of the file')
         s3filename=url_id+".mp4"
         ydl_opts = { 'outtmpl': '-', 'cachedir': False, 'logtostderr': True, 'format': 'bestaudio/best',
             'postprocessors': [{
@@ -52,7 +49,9 @@ def lambda_handler(event, context):
         filename = result['title']
 
         db_tb.put_item(
-            Item={'videoID':url_id,
+            Item={
+                'VideoID': url_id,
+                'Status'  : 1,
                 'filename' : filename,
              } )
         print('done')
