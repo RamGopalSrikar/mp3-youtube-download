@@ -12,8 +12,9 @@ class status(Enum):
 
 def lambda_handler(event, context):
     # TODO implement
-    #URL_id=event['params']['path']['URL']
-    URL_id='sCbbMZ-q4-I'
+    print(event)
+    URL_id=event['params']['path']['URL']
+    print(URL_id)
     #initiating return parameters
     Status=0
     name = 'None'
