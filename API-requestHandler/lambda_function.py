@@ -8,17 +8,14 @@ class status(Enum):
     COMPLETED = 2
     FAILED = 3
 
-
-
 def lambda_handler(event, context):
     # TODO implement
     print(event)
-    URL_id=event['params']['path']['URL']
+    URL_id= event['params']['path']['URL']
     print(URL_id)
     #initiating return parameters
-    Status=0
-    name = 'None'
-    S3_presignedUrl='Not Available'
+    Status=status.EMPTY.value
+    S3_presignedUrl='None'
     #removing special characters
     alpha_url_id = ""
 
@@ -55,10 +52,8 @@ def lambda_handler(event, context):
 
 
     return {
-        'statusCode': 200,
-        'name':name,
         'Status' : Status,
-        's3presigned-url': S3_presignedUrl
+        'url': S3_presignedUrl
     }
 
 

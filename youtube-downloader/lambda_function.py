@@ -56,11 +56,11 @@ def lambda_handler(event, context):
                     result=ydl.extract_info(url)
 
         filename = result['title']
-
+        Status=status.PROCESSING.value
         db_tb.put_item(
             Item={
                 'VideoID': url_id,
-                'Status'  : 1,
+                'Status' : Status,
                 'filename' : filename,
              } )
         print('done')
